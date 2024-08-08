@@ -1,60 +1,25 @@
 import ContactForm from "./ContactForm/ContactForm";
 import SearchBox from "./SearchBox/SearchBox";
 import ContactList from "./ContactList/ContactList";
-import { nanoid } from "nanoid";
-import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { selectContacts } from "../redux/contactsSlice";
+import { selectNameFilter } from "../redux/filtersSlice";
 import s from "./App.module.css";
 
 function App() {
-  const localKey = "contactsData";
-  const [contacts, setContacts] = useState(() => {
-    const savedData = window.localStorage.getItem(localKey);
+  const contacts = useSelector(selectContacts);
+  const filter = useSelector(selectNameFilter);
 
-    if (savedData !== null) {
-      return JSON.parse(savedData);
-    }
-    return [
-      { id: "id-1", name: "Rosie Simpson", number: "459-12-56" },
-      { id: "id-2", name: "Hermione Kline", number: "443-89-12" },
-      { id: "id-3", name: "Eden Clements", number: "645-17-79" },
-      { id: "id-4", name: "Annie Copeland", number: "227-91-26" },
-    ];
-  });
-  const [searchValue, setSearchValue] = useState("");
-  const [filteredContacts, setFilteredContacts] = useState(contacts);
-  const handleFilter = (e) => {
-    setSearchValue(e.target.value);
-  };
+  const filteredContacts = contacts.filter((contact) =>
+    contact.name.toLowerCase().includes(filter.toLowerCase())
+  );
 
-  const updateContacts = (contact) => {
-    setContacts([...contacts, { ...contact, id: nanoid() }]);
-  };
-
-  const deleteContact = (contactId) => {
-    setContacts(
-      contacts.filter((contact) => {
-        return contact.id !== contactId;
-      })
-    );
-  };
-
-  useEffect(() => {
-    setFilteredContacts(
-      contacts.filter((contact) => {
-        return contact.name.toLowerCase().includes(searchValue.toLowerCase());
-      })
-    );
-  }, [searchValue, contacts]);
-
-  useEffect(() => {
-    window.localStorage.setItem(localKey, JSON.stringify(contacts));
-  }, [contacts]);
   return (
     <div className={s.wrapper}>
       <h1>Phonebook</h1>
-      <ContactForm func={updateContacts} />
-      <SearchBox func={handleFilter} value={searchValue} />
-      <ContactList contacts={filteredContacts} deleteContact={deleteContact} />
+      <ContactForm />
+      <SearchBox />
+      <ContactList contacts={filteredContacts} />
     </div>
   );
 }

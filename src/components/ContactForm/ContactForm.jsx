@@ -1,27 +1,33 @@
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { addContact } from "../../redux/contactsSlice";
 import s from "./ContactForm.module.css";
 
-const ContactForm = ({ func }) => {
+const ContactForm = () => {
+  const dispatch = useDispatch();
+
   const initialValues = {
     name: "",
     number: "",
   };
+
   const handleSubmit = (data, actions) => {
-    func(data);
+    dispatch(addContact(data));
     actions.resetForm();
   };
 
   const userSchema = Yup.object({
-    name: Yup.string("this is required field")
+    name: Yup.string("This is required field")
       .required()
-      .min(3, "write minimum 3 symbols")
-      .max(50, "write maximum 50 symbols"),
-    number: Yup.string("this is required field")
+      .min(3, "Minimum 3 symbols")
+      .max(50, "Maximum 50 symbols"),
+    number: Yup.string("This is required field")
       .required()
-      .min(3, "write minimum 3 symbols")
-      .max(50, "write maximum 50 symbols"),
+      .min(3, "Minimum 3 symbols")
+      .max(50, "Maximum 50 symbols"),
   });
+
   return (
     <div>
       <Formik
